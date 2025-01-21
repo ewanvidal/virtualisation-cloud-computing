@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  namespace: vidal-guillot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: gcr.io/projet_calculatrice/frontend:latest
+        resources:
+            requests:
+              cpu: "4m"
+              memory: "32Mi"
+        ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: vidal-guillot
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
