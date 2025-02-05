@@ -1,46 +1,67 @@
-# Kubernetes Setup - Projet Calculatrice
+# Kubernetes Setup - Calculator Project
 
-Ce document décrit les fichiers nécessaires pour déployer et gérer l'application calculatrice sur Kubernetes. Il inclut également les commandes pour appliquer et supprimer les ressources dans Kubernetes.
+This document describes the files needed to deploy and manage the calculator application on Kubernetes. It also includes commands to apply, observe and delete resources in Kubernetes.
 
-## Objectifs des Fichiers
+## File Objectives
 
-### 1. **`frontend-replicaset.yaml`**
+### 1. **`frontend.yaml`**
 
-Ce fichier définit un **ReplicaSet** et un **Service** pour le frontend de l'application. Le ReplicaSet permet d'assurer que plusieurs réplicas de votre application frontend soient déployés et maintenus, et le Service permet d'exposer le frontend au sein du cluster.
+This file defines a **ReplicaSet** and a **Service** for the frontend of the application. The ReplicaSet ensures that multiple replicas of your frontend application are deployed and maintained, and the Service exposes the frontend within the cluster.
 
-### 2. **`backend-replicaset.yaml`**
+### 2. **`api.yaml`**
 
-Ce fichier définit un **ReplicaSet** et un **Service** pour le backend de l'application. Comme pour le frontend, le ReplicaSet veille à maintenir plusieurs réplicas du backend et le Service expose le backend au sein du cluster Kubernetes.
+This file defines a **ReplicaSet** and a **Service** for the backend of the application. Similar to the frontend, the ReplicaSet ensures that multiple replicas of the backend are maintained, and the Service exposes the backend within the Kubernetes cluster.
 
-### 3. **`redis-replicaset.yaml`**
+### 3. **`redis.yaml`**
 
-Ce fichier crée un **ReplicaSet** et un **Service** pour Redis. Redis est utilisé comme un cache ou une base de données en mémoire. Le Service permet à d'autres services de se connecter à Redis dans le cluster.
+This file creates a **ReplicaSet** and a **Service** for Redis. Redis is used as an in-memory cache or database to store calculations. The Service allows other services to connect to Redis within the cluster.
 
-### 4. **`rabbitmq-replicaset.yaml`**
+### 4. **`rabbitmq.yaml`**
 
-Ce fichier définit un **ReplicaSet** et un **Service** pour RabbitMQ. RabbitMQ est utilisé comme un serveur de messagerie pour la communication entre les microservices. Le Service permet aux autres services de communiquer avec RabbitMQ.
+This file defines a **ReplicaSet** and a **Service** for RabbitMQ. RabbitMQ is used as a messaging server for communication between microservices. The Service allows other services to communicate with RabbitMQ.
 
 ### 5. **`ingress.yaml`**
 
-Ce fichier crée un **Ingress** pour exposer les services frontend et backend à l'extérieur du cluster Kubernetes via un nom de domaine spécifique. L'Ingress permet de configurer les règles de routage pour que les utilisateurs accèdent à l'application via l'URL configurée.
+This file creates an **Ingress** to expose the frontend and backend services outside the Kubernetes cluster via a specific domain name. The Ingress configures routing rules so that users can access the application through the configured URL.
 
-## Commandes pour Appliquer les Fichiers
+## Commands to Apply the Files
 
-Après avoir préparé les fichiers YAML, vous pouvez appliquer les ressources Kubernetes avec les commandes suivantes :
+After preparing the YAML files, you can apply the Kubernetes resources with the following commands:
 
-### Appliquer les fichiers
+### Apply the files
 
 ```bash
-kubectl apply -f frontend.yaml
-kubectl apply -f backend.yaml
-kubectl apply -f redis.yaml
-kubectl apply -f rabbitmq.yaml
-kubectl apply -f ingress.yaml
-kubectl apply -f namespace.yaml
+# In the "kubernetes" directory
+make frontend
+make api
+make redis
+make rabbitmq
+make consumer
+
+kubectl apply -f ingress.yaml -n vidal-guillot
 ```
 
-### Pour tout supprimer
+### To delete everything
 
 ```bash
-kubectl delete rs,svc,pods,ingress --all
+# In the "kubernetes" directory
+make delete-all
+```
+
+### To see the pods
+
+```bash
+make get-pods
+```
+
+### To see the services
+
+```bash
+make get-services
+```
+
+### To see the replicasets
+
+```bash
+make get-replicasets
 ```
