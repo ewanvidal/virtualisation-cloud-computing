@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: consumer-replicaset
+  namespace: vidal-guillot
+  labels:
+    app: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+        - name: consumer
+          image: europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/vidal-guillot-consumer:latest
+          env:
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: RABBITMQ_HOST
+              value: "rabbitmq-service"
+          resources:
+            requests:
+              cpu: "4m"
+              memory: "32Mi"
