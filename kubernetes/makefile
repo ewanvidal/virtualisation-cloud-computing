@@ -16,12 +16,12 @@ consumer:
 	kubectl apply -f consumer.yaml -n $(NAMESPACE)
 
 rabbitmq:
-	kubectl delete rs rabbitmq -n $(NAMESPACE) --ignore-not-found
+	kubectl delete rs rabbitmq-replicaset -n $(NAMESPACE) --ignore-not-found
 	kubectl delete svc rabbitmq-service -n $(NAMESPACE) --ignore-not-found
 	kubectl apply -f rabbitmq.yaml -n $(NAMESPACE)
 
 redis:
-	kubectl delete rs redis -n $(NAMESPACE) --ignore-not-found
+	kubectl delete rs redis-replicaset -n $(NAMESPACE) --ignore-not-found
 	kubectl delete svc redis-service -n $(NAMESPACE) --ignore-not-found
 	kubectl apply -f redis.yaml -n $(NAMESPACE)
 
