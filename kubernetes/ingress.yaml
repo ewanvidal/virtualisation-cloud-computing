@@ -9,6 +9,13 @@ spec:
   - host: calculatrice-vidal-guillot-polytech-dijon.kiowy.net
     http:
       paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 5000
       - path: /
         pathType: Prefix
         backend:
@@ -16,10 +23,3 @@ spec:
             name: frontend-service
             port:
               number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: backend-service
-            port:
-              number: 5000

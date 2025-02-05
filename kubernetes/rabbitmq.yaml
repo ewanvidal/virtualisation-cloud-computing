@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: rabbitmq
+  name: rabbitmq-replicaset
   namespace: vidal-guillot
 spec:
   replicas: 1

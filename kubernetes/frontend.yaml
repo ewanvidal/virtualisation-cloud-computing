@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: gcr.io/projet_calculatrice/frontend:latest
+        image: europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/vidal-guillot-calculator:latest
         resources:
             requests:
               cpu: "4m"
