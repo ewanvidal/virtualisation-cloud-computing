@@ -1,17 +1,20 @@
-FROM node:18 as build
+FROM node:18 AS build
 
 WORKDIR /app
 
-COPY ./package*.json ./
-
+# Copy package.json and package-lock.json in order to install dependencies
+COPY package*.json ./
 RUN npm install
 
 COPY . .
 
+# Build the React application
 RUN npm run build
 
+# Use NGINX to serve the application
 FROM nginx:alpine
 
+# Copy the build folder from React to the NGINX folder
 COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
