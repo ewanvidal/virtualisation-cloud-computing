@@ -3,12 +3,25 @@ import pika
 import redis
 import uuid
 import json
+import os
 
 app = Flask(__name__)
-redis_client = redis.Redis(host="redis-service", port=6379, decode_responses=True)
+
+ENV = os.getenv("ENV", "production")
+
+if ENV == "development":
+    REDIS_HOST = "redis-dev-service"
+    RABBITMQ_HOST = "rabbitmq-dev-service"
+    print("[API] Development environment")
+else:
+    REDIS_HOST = "redis-service"
+    RABBITMQ_HOST = "rabbitmq-service"
+    print("[API] Production environment")
+    
+redis_client = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
+
 
 # RabbitMQ configuration
-RABBITMQ_HOST = "rabbitmq-service"  # Kubernetes service name
 
 def send_to_queue(calculation):
     """Send a message to the queue 'calculation' of RabbitMQ."""

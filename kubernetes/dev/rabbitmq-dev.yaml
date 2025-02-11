@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rabbitmq-dev-replicaset
+  namespace: vidal-guillot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq-dev
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-dev
+    spec:
+      containers:
+      - name: rabbitmq-dev
+        image: rabbitmq:3.12-management
+        resources:
+          requests:
+            cpu: "4m"
+            memory: "32Mi"
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-dev-service
+  namespace: vidal-guillot
+spec:
+  selector:
+    app: rabbitmq-dev
+  ports:
+    - name: rabbitmqapi-dev
+      port: 5672
+      targetPort: 5672
+    - name: management-dev
+      port: 15672
+      targetPort: 15672

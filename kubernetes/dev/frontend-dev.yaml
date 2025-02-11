@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend-dev
+  namespace: vidal-guillot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-dev
+  template:
+    metadata:
+      labels:
+        app: frontend-dev
+    spec:
+      containers:
+      - name: frontend-dev
+        image: europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/vidal-guillot-calculator-dev:latest
+        resources:
+            requests:
+              cpu: "4m"
+              memory: "32Mi"
+        ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-dev-service
+  namespace: vidal-guillot
+spec:
+  selector:
+    app: frontend-dev
+  ports:
+    - port: 80
+      targetPort: 80
