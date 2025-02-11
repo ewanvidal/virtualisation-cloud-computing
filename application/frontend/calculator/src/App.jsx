@@ -1,22 +1,16 @@
-import './App.css';
-
 import React, { useState } from 'react';
-import Button from './components/ui/Button';
-import Card from './components/ui/Card';
-import CardContent from './components/ui/CardContent';
-import Input from './components/ui/Input';
+import './App.css';
 
 export default function App() {
   const [calculation, setCalculation] = useState('');
-  const [result, setResult] = useState('');
+  const [displayValue, setDisplayValue] = useState('0');
   const [calc_id, setCalc_id] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const handleSend = async () => {
-    if (!calculation) return alert("Please enter a calculation");
-    setLoading(true);
+    if (!calculation) return;
     try {
       console.log("Sending calculation to the API:", calculation);
       const response = await fetch(`${API_URL}/api/send`, {
@@ -26,79 +20,90 @@ export default function App() {
       });
       const data = await response.json();
       setCalc_id(data.id);
-      setResult(`Calculation sent with id: ${data.id}`);
+      setHistory(prev => [...prev, { calculation, id: data.id }]);
+      handleGetResult(data.id);
     } catch (error) {
       console.error(error);
-      setResult("Error while sending the calculation");
-    } finally {
-      setLoading(false);
     }
   };
-
-  const handleGetResult = async () => {
-    if (!calc_id) return alert("Please enter a calculation ID");
-    setLoading(true);
+  
+  const handleGetResult = async (id) => {
     try {
-      const response = await fetch(`${API_URL}/api/result/${calc_id}`);
+      const response = await fetch(`${API_URL}/api/result/${id}`);
       const data = await response.json();
       if (data.result) {
-        setResult(`Result for id ${calc_id} : ${data.result}`);
-      } else {
-        setResult("No result found for this id");
+        setDisplayValue(data.result);
       }
     } catch (error) {
       console.error(error);
-      setResult("Error while getting the result");
-    } finally {
-      setLoading(false);
     }
+  };
+  
+
+  const handleNumber = (num) => {
+    const newCalculation = calculation + num;
+    setCalculation(newCalculation);
+    setDisplayValue(newCalculation); // Update display as we type
+  };
+
+  const handleOperator = (op) => {
+    if (!calculation || /[\+\-\*\/]$/.test(calculation)) return;
+    setCalculation(prev => prev + op);
+    setDisplayValue(prev => prev + op);
+  };
+
+  const clear = () => {
+    setCalculation('');
+    setDisplayValue('0');
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardContent className="space-y-4">
-          <h1 className="text-2xl font-bold text-center">Vidalculator 🤓☝️</h1>
+    <div className="calculator-container">
 
-          <Input
-            type="text"
-            placeholder="Calulation to send (e.g. 2+2*2)"
-            value={calculation}
-            onChange={(e) => setCalculation(e.target.value)}
-            className="p-2 border rounded w-full"
-          />
-
-          <Button
-            onClick={handleSend}
-            className="w-full bg-blue-500 text-white rounded p-2 hover:bg-blue-600"
-            disabled={loading}
+      <div className="display">
+        <div className="current-calculation">{calculation || '0'}</div>
+        <div className="result">{displayValue}</div>
+      </div>
+      <div className="keypad">
+        <button className="button clear" onClick={clear}>AC</button>
+        {['7', '8', '9', '÷', '4', '5', '6', '×', '1', '2', '3', '-', '0', '.', '=', '+'].map((btn, index) => (
+          <button
+            key={index}
+            className={`button ${['÷', '×', '-', '+', '='].includes(btn) ? 'operator' : ''}`}
+            onClick={() => {
+              if (btn === '=') {
+                handleSend();
+                handleGetResult();
+              } else if (btn === '×') {
+                handleOperator('*');
+              } else if (btn === '÷') {
+                handleOperator('/');
+              } else if (['÷', '×', '-', '+'].includes(btn)) {
+                handleOperator(btn);
+              } else {
+                handleNumber(btn);
+              }
+            }}
           >
-            Send the calculation
-          </Button>
-
-          <Input
-            type="text"
-            placeholder="Calculation ID to get the result"
-            value={calc_id}
-            onChange={(e) => setCalc_id(e.target.value)}
-            className="p-2 border rounded w-full"
-          />
-
-          <Button
-            onClick={handleGetResult}
-            className="w-full bg-green-500 text-white rounded p-2 hover:bg-green-600"
-            disabled={loading}
+            {btn}
+          </button>
+        ))}
+      </div>
+      <div className="history">
+        <h2>History</h2>
+        {history.map((item, index) => (
+          <div 
+            key={index}
+            className="history-item"
+            onClick={() => {
+              handleGetResult(item.id);
+              setCalculation(item.calculation);
+            }}
           >
-            Get the result
-          </Button>
-
-          {result && (
-            <div className="p-2 bg-gray-200 rounded text-center text-lg font-semibold">
-              {result}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {item.calculation} et est égal à {eval(item.calculation)}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
