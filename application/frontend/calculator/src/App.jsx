@@ -4,7 +4,6 @@ import './App.css';
 export default function App() {
   const [calculation, setCalculation] = useState('');
   const [displayValue, setDisplayValue] = useState('0');
-  const [calc_id, setCalc_id] = useState('');
   const [history, setHistory] = useState([]);
 
   const handleSend = async () => {
@@ -16,7 +15,6 @@ export default function App() {
         body: JSON.stringify({ calculation }),
       });
       const data = await response.json();
-      setCalc_id(data.id);
       setHistory(prev => [...prev, { calculation, id: data.id }]);
       handleGetResult(data.id);
     } catch (error) {
@@ -70,7 +68,6 @@ export default function App() {
             onClick={() => {
               if (btn === '=') {
                 handleSend();
-                handleGetResult();
               } else if (btn === '×') {
                 handleOperator('*');
               } else if (btn === '÷') {
