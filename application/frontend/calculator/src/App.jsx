@@ -12,12 +12,14 @@ export default function App() {
   const [calc_id, setCalc_id] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const handleSend = async () => {
     if (!calculation) return alert("Please enter a calculation");
     setLoading(true);
     try {
       console.log("Sending calculation to the API:", calculation);
-      const response = await fetch("http://calculatrice-vidal-guillot-polytech-dijon.kiowy.net/api/send", {
+      const response = await fetch(`${API_URL}/api/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ calculation }),
@@ -37,7 +39,7 @@ export default function App() {
     if (!calc_id) return alert("Please enter a calculation ID");
     setLoading(true);
     try {
-      const response = await fetch(`http://calculatrice-vidal-guillot-polytech-dijon.kiowy.net/api/result/${calc_id}`);
+      const response = await fetch(`${API_URL}/api/result/${calc_id}`);
       const data = await response.json();
       if (data.result) {
         setResult(`Result for id ${calc_id} : ${data.result}`);

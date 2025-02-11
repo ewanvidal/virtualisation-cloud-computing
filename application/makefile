@@ -14,17 +14,32 @@ init:
 # Build all images from Dockerfiles
 build-images:
 	$(foreach dir, $(DOCKERFILES_LOCATIONS), \
-		docker build -t $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir)):$(DOCKER_TAG) ./$(dir); \
+		$(if $(findstring frontend/calculator,$(dir)), \
+			docker build -t $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir))-prod:$(DOCKER_TAG) --build-arg REACT_APP_API_URL=http://calculatrice-vidal-guillot-polytech-dijon.kiowy.net ./$(dir); \
+			docker build -t $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir))-dev:$(DOCKER_TAG) --build-arg REACT_APP_API_URL=http://calculatrice-dev-vidal-guillot-polytech-dijon.kiowy.net ./$(dir); \
+		, \
+			docker build -t $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir)):$(DOCKER_TAG) ./$(dir); \
+		) \
 	)
 
 # Push all images to the Docker Registry
 push-images:
 	$(foreach dir, $(DOCKERFILES_LOCATIONS), \
-		docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir)):$(DOCKER_TAG); \
+		$(if $(findstring frontend/calculator,$(dir)), \
+			docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir))-prod:$(DOCKER_TAG); \
+			docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir))-dev:$(DOCKER_TAG); \
+		, \
+			docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir)):$(DOCKER_TAG); \
+		) \
 	)
 
 # Scan all images with Trivy
 trivy:
 	$(foreach dir, $(DOCKERFILES_LOCATIONS), \
-		trivy image $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir)):$(DOCKER_TAG); \
+		$(if $(findstring frontend/calculator,$(dir)), \
+			trivy image $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir))-prod:$(DOCKER_TAG); \
+			trivy image $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir))-dev:$(DOCKER_TAG); \
+		, \
+			trivy image $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_PREFIX)-$(notdir $(dir)):$(DOCKER_TAG); \
+		) \
 	)
