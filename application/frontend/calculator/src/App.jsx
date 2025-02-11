@@ -70,7 +70,9 @@ export default function App() {
             className={`button ${['÷', '×', '-', '+', '='].includes(btn) ? 'operator' : ''}`}
             onClick={() => {
               if (btn === '=') {
-                handleSend();
+                if (!/[\+\-\*\/]$/.test(calculation)) { //Checking if the last character is an operator
+                  handleSend();
+                }
               } else if (btn === '×') {
                 handleOperator('*');
               } else if (btn === '÷') {
